@@ -1,0 +1,5 @@
+{
+  "realm": "EduRealm",
+  "enabled": true,
+  "_comment": "System Realm with 'enabled: true' (this realm is ready to use)"
+}

@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+
+  nginx:
+    image: nginx:1.27.2
+    restart: unless-stopped
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
+    ports:
+      - "80:80"
+
+  identity:
+    image: quay.io/keycloak/keycloak:26.0.2
+    container_name: "keycloak"
+    command:
+      - start-dev
+      - --import-realm
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    volumes:
+      - ./identity/realms/access-management-realm.json:/opt/identity/data/import/access-management-realm.json
+    ports:
+      - 8080:8080
+
+  redis:
+    image: redis:7.2
+    container_name: "redis"
+    ports:
+      - 6379:6379
+
+  user_service:
+    image: user_service:latest
