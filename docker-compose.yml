@@ -2,14 +2,6 @@ version: "3.9"
 
 services:
 
-  nginx:
-    image: nginx:1.27.2
-    restart: unless-stopped
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
-    ports:
-      - "80:80"
-
   identity:
     image: quay.io/keycloak/keycloak:26.0.2
     container_name: "keycloak"
@@ -17,18 +9,44 @@ services:
       - start-dev
       - --import-realm
     environment:
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN}
     volumes:
-      - ./identity/realms/access-management-realm.json:/opt/identity/data/import/access-management-realm.json
+      - ./identity/realms/realm-export.json:/opt/keycloak/data/import/realm-export.json
     ports:
-      - 8080:8080
+      - "8080:8080"
+    networks:
+      - course-network
 
   redis:
     image: redis:7.2
     container_name: "redis"
     ports:
-      - 6379:6379
+      - "6379:6379"
 
-  user_service:
-    image: user_service:latest
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: "mssql"
+    hostname: "mssql"
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=${ACCEPT_EULA}
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+    restart: unless-stopped
+    volumes:
+      - ./data/mssql/backups:/var/opt/mssql/backups
+      - ./data/mssql/data:/var/opt/mssql/data
+      - ./data/mssql/log:/var/opt/mssql/log
+      - ./data/mssql/sql:/sql
+    networks:
+      - course-network
+
+
+
+
+
+networks:
+  course-network:
+    driver: bridge
+    name: course-network
