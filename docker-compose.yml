@@ -1,20 +1,55 @@
 version: "3.9"
 
+# application stack - Each server when running will create a separate container
 services:
 
-  identity:
+  identity: # This container used for initializing Identity Provider - Keycloak
     image: quay.io/keycloak/keycloak:26.0.2
     container_name: "keycloak"
     command:
       - start-dev
       - --import-realm
     environment:
-      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
-      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN}
+      - KC_BOOTSTRAP_ADMIN_USERNAME=${KC_BOOTSTRAP_ADMIN_USERNAME}
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=${KC_BOOTSTRAP_ADMIN_PASSWORD}
+      - KC_DB=${MSSQL_HOSTNAME}
+      - KC_DB_URL=${KC_DB_URL}
+      - KC_DB_USERNAME=${MSSQL_SA_USERNAME}
+      - KC_DB_PASSWORD=${MSSQL_SA_PASSWORD}
     volumes:
       - ./identity/realms/realm-export.json:/opt/keycloak/data/import/realm-export.json
+    depends_on:
+      - mssql
     ports:
       - "8080:8080"
+    networks:
+      - course-network
+
+  mssql:  # This container used for initializing SQL Server
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: "mssql"
+    hostname: "mssql"
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=${MSSQL_SA_USERNAME}
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+    restart: unless-stopped
+    volumes:
+      - ./data/mssql/backups:/var/opt/mssql/backups
+      - ./data/mssql/data:/var/opt/mssql/data
+      - ./data/mssql/log:/var/opt/mssql/log
+      #- ./data/mssql/sql:/sql
+    networks:
+      - course-network
+
+  mssql-cmd:  # This container used for executing SQL scripts in SQL Server
+    image: mcr.microsoft.com/mssql-tools:latest
+    container_name: "mssql-cmd"
+    command: /opt/mssql_scripts/run-initialization.sh
+    stdin_open: true
+    volumes:
+      - ./mssql_scripts:/opt/mssql_scripts
     networks:
       - course-network
 
@@ -23,22 +58,6 @@ services:
     container_name: "redis"
     ports:
       - "6379:6379"
-
-  mssql:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: "mssql"
-    hostname: "mssql"
-    ports:
-      - "1433:1433"
-    environment:
-      - ACCEPT_EULA=${ACCEPT_EULA}
-      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
-    restart: unless-stopped
-    volumes:
-      - ./data/mssql/backups:/var/opt/mssql/backups
-      - ./data/mssql/data:/var/opt/mssql/data
-      - ./data/mssql/log:/var/opt/mssql/log
-      - ./data/mssql/sql:/sql
     networks:
       - course-network
 
