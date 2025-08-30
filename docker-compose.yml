@@ -39,7 +39,6 @@ services:
       - ./data/mssql/backups:/var/opt/mssql/backups
       - ./data/mssql/data:/var/opt/mssql/data
       - ./data/mssql/log:/var/opt/mssql/log
-      #- ./data/mssql/sql:/sql
     networks:
       - course-network
 
