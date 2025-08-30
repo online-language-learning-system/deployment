@@ -1,1 +1,1 @@
-docker-compose up -d <service name>
+docker-compose up -d service-name
