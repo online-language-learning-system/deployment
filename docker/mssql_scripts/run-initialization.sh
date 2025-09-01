@@ -1,7 +1,10 @@
 #!/bin/bash
+
+# Script Bash (Linux/Bash)
+
 set -e   # Stop script when error happens
 
-SERVER="mssql,1433"
+SERVER="mssql,14330"
 USER="sa"
 PASSWORD="YourStrong(!)Password"
 DB="master"
