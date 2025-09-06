@@ -4,7 +4,7 @@
 
 set -e   # Stop script when error happens
 
-SERVER="mssql,14330"
+SERVER="mssql,1433"
 USER="sa"
 PASSWORD="YourStrong(!)Password"
 DB="master"

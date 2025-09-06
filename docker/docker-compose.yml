@@ -1,25 +1,33 @@
 version: "3.9"
 
 # application stack - Each server when running will create a separate container
+
+# In the internal docker network (containers call each other)
+#  → you use the service name (service-name:port).
+# From the host machine (browser, Postman)
+#  → you use localhost + mapped port (localhost:port).
+
 services:
 
   identity: # This container used for initializing Identity Provider - Keycloak
     image: quay.io/keycloak/keycloak:26.0.2
-    container_name: "keycloak"
+    container_name: "identity"
     command:
       - start-dev
       - --import-realm
+      - --spi-theme-cache-themes=false
+      - --spi-theme-cache-templates=false
     environment:
+      #- KC_HOSTNAME=localhost
       - KC_BOOTSTRAP_ADMIN_USERNAME=${KC_BOOTSTRAP_ADMIN_USERNAME}
       - KC_BOOTSTRAP_ADMIN_PASSWORD=${KC_BOOTSTRAP_ADMIN_PASSWORD}
-      - KC_DB=${MSSQL_HOSTNAME}
-      - KC_DB_URL=${KC_DB_URL}
-      - KC_DB_USERNAME=${MSSQL_SA_USERNAME}
-      - KC_DB_PASSWORD=${MSSQL_SA_PASSWORD}
+      #- KC_DB=${MSSQL_HOSTNAME}
+      #- KC_DB_URL=${KC_DB_URL}
+      #- KC_DB_USERNAME=${MSSQL_SA_USERNAME}
+      #- KC_DB_PASSWORD=${MSSQL_SA_PASSWORD}
     volumes:
       - ./identity/realms/realm-export.json:/opt/keycloak/data/import/realm-export.json
-    depends_on:
-      - mssql
+      - ./identity/themes/olls:/opt/keycloak/themes/olls
     ports:
       - "8080:8080"
     networks:
@@ -45,6 +53,8 @@ services:
   mssql-cmd:  # This container used for executing SQL scripts in SQL Server
     image: mcr.microsoft.com/mssql-tools:latest
     container_name: "mssql-cmd"
+    depends_on:
+      - mssql
     command: /opt/mssql_scripts/run-initialization.sh
     stdin_open: true
     volumes:
@@ -60,7 +70,36 @@ services:
     networks:
       - course-network
 
+  user-service:
+    build: D:/Work/course-management-system/user-service
+    container_name: "user-service"
+    image: user-service:latest
+    ports:
+      - "9000:9000"
+    environment:
+      - KEYCLOAK_SERVER_URI=${KEYCLOAK_SERVER_URI}
+      - KEYCLOAK_CLIENT_SECRET_USER=${KEYCLOAK_CLIENT_SECRET_USER}
+      - KEYCLOAK_ISSUER_URI=${KEYCLOAK_ISSUER_URI}
+      - spring.datasource.url=${DATASOURCE_URL}
+      - spring.datasource.username=${MSSQL_SA_USERNAME}
+      - spring.datasource.password=${MSSQL_SA_PASSWORD}
+      - spring.datasource.driver-class-name=${SPRING_DATASOURCE_DRIVER_CLASS_NAME}
+    networks:
+      - course-network
 
+  storefront-bff:
+    build: D:/Work/course-management-system/storefront-bff
+    container_name: "storefront-bff"
+    image: storefront-bff:latest
+    ports:
+      - "8000:8000"
+    environment:
+      - KEYCLOAK_CLIENT_SECRET_STOREFRONT=${KEYCLOAK_CLIENT_SECRET_STOREFRONT}
+      - KEYCLOAK_TOKEN_URI=${KEYCLOAK_TOKEN_URI}
+      - KEYCLOAK_ISSUER_URI=${KEYCLOAK_ISSUER_URI}
+      - USER_SERVICE_URI=${USER_SERVICE_URI}
+    networks:
+      - course-network
 
 
 
