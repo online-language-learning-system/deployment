@@ -1,13 +1,21 @@
 import React, { useState } from "react";
 import styles from "./css/auth.module.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import axios from "axios";
 
 export default function Auth() {
   const [isActive, setIsActive] = useState(false);
 
+  // State quản lý form đăng ký
+  const [registerForm, setRegisterForm] = useState({
+    username: "",
+    email: "",
+    password: "",
+    passwordConfirm: "",
+  });
+
   const handleLogin = (e) => {
     console.log("Login form submitted");
-
     e.preventDefault();
 
     const username = e.target.username.value;
@@ -15,7 +23,7 @@ export default function Auth() {
 
     const form = document.createElement("form");
     form.method = "POST";
-    form.action = window.__KEYCLOAK_CONTEXT__.actionUrl;
+    form.action = window.__KEYCLOAK_CONTEXT__?.actionUrl || "#";
 
     const userInput = document.createElement("input");
     userInput.type = "hidden";
@@ -33,11 +41,51 @@ export default function Auth() {
     form.submit();
   };
 
-  const handleRegister = (e) => {
-    e.preventDefault();
-    console.log("Register form submitted");
-    // TODO: gọi API register
+  const getToken = async () => {
+    try {
+      const res = await axios.get("http://localhost:8000/get-token");
+      const token = res.data.accessToken;
+      return token;
+    } catch (err) {
+      console.error("Lỗi lấy token", err);
+      return null;
+    }
   };
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    console.log("Register form submitted", registerForm);
+
+    try {
+
+      const accessToken = await getToken();
+
+      const res = await axios.post(
+        "http://localhost:8000/storefront/users",
+        {
+          username: registerForm.username,
+          email: registerForm.email,
+          password: registerForm.password,
+          passwordConfirm: registerForm.passwordConfirm,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      alert("Đăng ký thành công! Hãy đăng nhập.");
+      console.log(res.data);
+
+      setIsActive(false);
+      setRegisterForm({ username: "", email: "", password: "", passwordConfirm: "" }); // reset form
+    } catch (err) {
+      console.error(err);
+      alert("Đăng ký thất bại!");
+    }
+  };
+
 
   return (
     <div className={`${styles.container} ${isActive ? styles.active : ""}`}>
@@ -54,10 +102,10 @@ export default function Auth() {
             <i className="fas fa-lock"></i>
           </div>
           <div className={styles["remember-forgot"]}>
-          <label>
-            <input type="checkbox" /> Remember me
-          </label>
-          <a href="#">Forgot Password?</a>
+            <label>
+              <input type="checkbox" /> Remember me
+            </label>
+            <a href="#">Forgot Password?</a>
           </div>
           <button type="submit" className={styles.btn}>
             Login
@@ -75,19 +123,47 @@ export default function Auth() {
         <form onSubmit={handleRegister}>
           <h1>Register</h1>
           <div className={styles["input-box"]}>
-            <input type="text" placeholder="Username" required />
+            <input
+              type="text"
+              name="username"
+              placeholder="Username"
+              required
+              value={registerForm.username}
+              onChange={(e) => setRegisterForm({ ...registerForm, username: e.target.value })}
+            />
             <i className="fas fa-user"></i>
           </div>
           <div className={styles["input-box"]}>
-            <input type="email" placeholder="Email" required />
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              required
+              value={registerForm.email}
+              onChange={(e) => setRegisterForm({ ...registerForm, email: e.target.value })}
+            />
             <i className="fas fa-envelope"></i>
           </div>
           <div className={styles["input-box"]}>
-            <input type="password" placeholder="Password" required />
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              required
+              value={registerForm.password}
+              onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
+            />
             <i className="fas fa-lock"></i>
           </div>
           <div className={styles["input-box"]}>
-            <input type="passwordconfirm" placeholder="PasswordConfirm" required />
+            <input
+              type="password"
+              name="passwordConfirm"
+              placeholder="Confirm Password"
+              required
+              value={registerForm.passwordConfirm}
+              onChange={(e) => setRegisterForm({ ...registerForm, passwordConfirm: e.target.value })}
+            />
             <i className="fas fa-lock"></i>
           </div>
           <button type="submit" className={styles.btn}>
