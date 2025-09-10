@@ -12,6 +12,9 @@ export default function Auth() {
     email: "",
     password: "",
     passwordConfirm: "",
+    firstName: "",
+    lastName: "",
+    role: "",
   });
 
   const handleLogin = (e) => {
@@ -67,6 +70,9 @@ export default function Auth() {
           email: registerForm.email,
           password: registerForm.password,
           passwordConfirm: registerForm.passwordConfirm,
+          firstName: registerForm.firstName,
+          lastName: registerForm.lastName,
+          role: registerForm.role,
         },
         {
           headers: {
@@ -79,7 +85,7 @@ export default function Auth() {
       console.log(res.data);
 
       setIsActive(false);
-      setRegisterForm({ username: "", email: "", password: "", passwordConfirm: "" }); // reset form
+      setRegisterForm({ username: "", email: "", password: "", passwordConfirm: "", firstName: "", lastName: "" }); // reset form
     } catch (err) {
       console.error(err);
       alert("Đăng ký thất bại!");
@@ -166,6 +172,50 @@ export default function Auth() {
             />
             <i className="fas fa-lock"></i>
           </div>
+          <div className={styles["input-box"]}>
+            <input
+              type="text"
+              name="firstName"
+              placeholder="First Name"
+              required
+              value={registerForm.firstName}
+              onChange={(e) => setRegisterForm({ ...registerForm, firstName: e.target.value })}
+            />
+            <i className="fa fa-signature"></i>
+          </div>
+          <div className={styles["input-box"]}>
+            <input
+              type="text"
+              name="lastName"
+              placeholder="Last Name"
+              required
+              value={registerForm.lastName}
+              onChange={(e) => setRegisterForm({ ...registerForm, lastName: e.target.value })}
+            />
+            <i className="fas fa-signature"></i>
+          </div>
+          
+          <div className={styles["input-box"]}>
+            <label>Register Role</label>
+            <div className={styles["roles-checkbox"]}>
+              {["STUDENT", "LECTURER"].map((role) => (
+                <label key={role}>
+                  <input
+                    type="radio"
+                    name="role"  // cùng name để chỉ chọn 1
+                    value={role}
+                    checked={registerForm.role === role}
+                    onChange={(e) =>
+                      setRegisterForm({ ...registerForm, role: e.target.value })
+                    }
+                  />
+                  <span>{role.charAt(0) + role.slice(1).toLowerCase()}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+
           <button type="submit" className={styles.btn}>
             Register
           </button>
