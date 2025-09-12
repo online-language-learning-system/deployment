@@ -83,23 +83,6 @@ services:
     networks:
       - course-network
 
-  user-service:
-    build: D:/Work/course-management-system/user-service
-    container_name: "user-service"
-    image: user-service:latest
-    ports:
-      - "9000:9000"
-    environment:
-      - KEYCLOAK_SERVER_URI=${KEYCLOAK_SERVER_URI}
-      - KEYCLOAK_CLIENT_SECRET_USER=${KEYCLOAK_CLIENT_SECRET_USER}
-      - KEYCLOAK_ISSUER_URI=${KEYCLOAK_ISSUER_URI}
-      - spring.datasource.url=${DATASOURCE_URL}
-      - spring.datasource.username=${MSSQL_SA_USERNAME}
-      - spring.datasource.password=${MSSQL_SA_PASSWORD}
-      - spring.datasource.driver-class-name=${SPRING_DATASOURCE_DRIVER_CLASS_NAME}
-    networks:
-      - course-network
-
   storefront-bff:
     build: D:/Work/course-management-system/storefront-bff
     container_name: "storefront-bff"
@@ -113,10 +96,47 @@ services:
       - KEYCLOAK_TOKEN_URI=${KEYCLOAK_TOKEN_URI}
       - KEYCLOAK_ISSUER_URI=${KEYCLOAK_ISSUER_URI}
       - USER_SERVICE_URI=${USER_SERVICE_URI}
+      - STOREFRONT_REACTJS_URI=${STOREFRONT_REACTJS_URI}
     networks:
       - course-network
 
+  storefront-reactjs:
+    container_name: "storefront-reactjs"
+    image: storefront:latest
+    ports:
+      - "3000:3000"
+    networks:
+      - course-network
 
+  user-service:
+    build: D:/Work/course-management-system/user-service
+    container_name: "user-service"
+    image: user-service:latest
+    ports:
+      - "9000:9000"
+    environment:
+      - KEYCLOAK_SERVER_URI=${KEYCLOAK_SERVER_URI}
+      - KEYCLOAK_CLIENT_SECRET_USER=${KEYCLOAK_CLIENT_SECRET_USER}
+      - KEYCLOAK_ISSUER_URI=${KEYCLOAK_ISSUER_URI}
+      - spring.datasource.url=${USER_DATASOURCE_URL}
+      - spring.datasource.username=${MSSQL_SA_USERNAME}
+      - spring.datasource.password=${MSSQL_SA_PASSWORD}
+      - spring.datasource.driver-class-name=${SPRING_DATASOURCE_DRIVER_CLASS_NAME}
+    networks:
+      - course-network
+
+  course-service:
+    image:  course-service:latest
+    container_name: "course-service"
+    ports:
+      - "9002:9002"
+    environment:
+      - KEYCLOAK_ISSUER_URI=${KEYCLOAK_ISSUER_URI}
+      - MSSQL_DATASOURCE_URL=${MSSQL_DATASOURCE_URL}
+      - MSSQL_SA_USERNAME=${MSSQL_SA_USERNAME}
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+    networks:
+      - course-network
 
 networks:
   course-network:
