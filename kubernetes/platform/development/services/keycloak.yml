@@ -1,0 +1,33 @@
+# -- Deployment → Create and manage Pods.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: identity
+  labels:
+    app: identity
+spec:
+
+---
+
+# -- Service → Expose this Pod group in the cluster.
+apiVersion: v1
+kind: Service
+metadata:
+  name: identity
+  labels:
+    app: identity
+spec: # Used to declare the desired configuration
+  type:
+  selector:
+  ports:
+
+---
+
+# -- Ingress (nếu có) → Expose Service outside the cluster.
+apiVersion:
+kind: Ingress
+metadata:
+  name:
+  labels:
+    app:
+spec:

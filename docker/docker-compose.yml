@@ -97,14 +97,15 @@ services:
       - KEYCLOAK_ISSUER_URI=${KEYCLOAK_ISSUER_URI}
       - USER_SERVICE_URI=${USER_SERVICE_URI}
       - STOREFRONT_REACTJS_URI=${STOREFRONT_REACTJS_URI}
+      - COURSE_SERVICE_URI=${COURSE_SERVICE_URI}
     networks:
       - course-network
 
   storefront-reactjs:
     container_name: "storefront-reactjs"
-    image: storefront:latest
+    image: storefront-reactjs:latest
     ports:
-      - "3000:3000"
+      - "3000:80"
     networks:
       - course-network
 
