@@ -6,28 +6,95 @@ metadata:
   labels:
     app: identity
 spec:
-
+  selector:
+    matchLabels:
+      app: identity
+  template:
+    metadata:
+      labels:
+        app: identity
+    spec:
+      containers:
+        - name: identity
+          image: quay.io/keycloak/keycloak:26.0.2
+          args: ["start-dev", "--import-realm"]
+          ports:
+            - containerPort: 8080
+          # -- Instead of putting env value directly in manifest,
+          # -- load them from Secret kind for security
+#          env:
+#            - name: KC_BOOTSTRAP_ADMIN_USERNAME
+#              value:
+#            - name: KC_BOOTSTRAP_ADMIN_PASSWORD
+#              value:
+          envFrom:
+            - secretRef:
+                name: keycloak-admin-secret
+          startupProbe:   # This is a health check that shows whether the container started successfully.
+            httpGet:
+              path: /realms/master
+              port: 8080
+            failureThreshold: 40      # K8s will retry 40 times
+            periodSeconds: 10         # One time during 10 seconds
+          readinessProbe:  # Used to tell K8s whether the service is ready to receive traffic.
+            httpGet:
+              path: /realms/master
+              port: 8080
+            initialDelaySeconds: 5    # Wait 5 seconds after starting to start probe.
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 350Mi
+            limits:
+              cpu: 500m
+              memory: 750Mi
+          volumeMounts:
+            - name: keycloak-config-volume
+              mountPath: /opt/keycloak/data/import
+      volumes:
+        - name: keycloak-config-volume
+          configMap:
+            name: keycloak-config
 ---
 
 # -- Service → Expose this Pod group in the cluster.
 apiVersion: v1
 kind: Service
 metadata:
-  name: identity
+  name: identity    # Inside the cluster will resolve DNS as identity.default.svc.cluster.local
   labels:
     app: identity
-spec: # Used to declare the desired configuration
-  type:
+spec:   # Used to declare the desired configuration
+  type: ClusterIP
   selector:
+    app: identity
   ports:
+    - protocol: TCP
+      port: 8080        # Port mà Service expose
+      targetPort: 8080  # Port container của Pod
+# Need to access from outside the cluster:
+# -- Use Ingress (map domain -> service)
+# -- Or use NodePort/LoadBalancer to map <IP_address>:<NodePort> -> Service port
 
 ---
 
 # -- Ingress (nếu có) → Expose Service outside the cluster.
-apiVersion:
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name:
+  name: keycloak-ingress
   labels:
-    app:
+    app: identity
 spec:
+  rules:
+    - host: identity
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: identity
+                port:
+                  number: 8080
