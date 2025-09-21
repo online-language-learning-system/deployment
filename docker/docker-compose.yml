@@ -126,6 +126,16 @@ services:
     networks:
       - course-network
 
+  media-service:
+    image: media-service:latest
+    container_name: "media-service"
+    ports:
+      - "9003:9003"
+    environment:
+      - KEYCLOAK_ISSUER_URI=${KEYCLOAK_ISSUER_URI}
+    networks:
+      - course-network
+
   course-service:
     image:  course-service:latest
     container_name: "course-service"
@@ -136,6 +146,7 @@ services:
       - MSSQL_DATASOURCE_URL=${MSSQL_DATASOURCE_URL}
       - MSSQL_SA_USERNAME=${MSSQL_SA_USERNAME}
       - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+      - MEDIA_SERVICE=${MEDIA_SERVICE}
     networks:
       - course-network
 
