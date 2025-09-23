@@ -53,13 +53,13 @@ services:
     ports:
       - "14330:1433"
     environment:
-      - ACCEPT_EULA=${MSSQL_SA_USERNAME}
+      - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
     restart: unless-stopped
     volumes:
-      - ./data/mssql/backups:/var/opt/mssql/backups
-      - ./data/mssql/data:/var/opt/mssql/data
-      - ./data/mssql/log:/var/opt/mssql/log
+      - ./data/mssql/backups:/var/opt/mssql/backups # SQL scripts, backups
+      - ./data/mssql/data:/var/opt/mssql/data       # Database files (.mdf, .ldf)
+      - ./data/mssql/log:/var/opt/mssql/log         # Log files
     networks:
       - course-network
 

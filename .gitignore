@@ -1,5 +1,2 @@
 # Docker
 *.env
-
-# SQL Server
-docker/data/
