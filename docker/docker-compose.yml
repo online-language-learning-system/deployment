@@ -127,7 +127,7 @@ services:
       - course-network
 
   media-service:
-    image: media-service:latest
+    image: ghcr.io/online-language-learning-system/media-service:latest
     container_name: "media-service"
     ports:
       - "9003:9003"

@@ -1,10 +1,24 @@
 server {
     # listen is Nginx port
     listen 80;
-    server_name olls.local;
+    server_name api.hajime.local;
 
     # Internal Docker DNS
     resolver 127.0.0.11;
+
+    location /user-service/ {
+        proxy_pass http://user-service:9000/user-service/;
+    }
+
+
+
+    location /course-service/ {
+        proxy_pass http://course-service:9002/course-service/;
+    }
+
+    location /media-service/ {
+        proxy_pass http://media-service:9003/media-service/;
+    }
 
 }
 
