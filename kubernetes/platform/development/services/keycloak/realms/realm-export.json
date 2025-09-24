@@ -789,7 +789,7 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "secret": "**********",
+      "secret": "hgDVSKURLE6VUsHT09AaZ3YlhYRy1JsF",
       "redirectUris": [
         "http://localhost:8001/*"
       ],
@@ -1049,7 +1049,7 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "secret": "**********",
+      "secret": "okuONdlbOa8WuTAzeb23tVwPAObA4RUd",
       "redirectUris": [
         "http://storefront/*",
         "http://localhost:8000/*"
@@ -1158,7 +1158,7 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "secret": "**********",
+      "secret": "ebyMQYbAe5zxWN2RPVZ5V7t2woDsRZjb",
       "redirectUris": [
         "/*"
       ],
