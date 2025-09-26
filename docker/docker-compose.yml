@@ -40,7 +40,8 @@ services:
       #- KC_DB_PASSWORD=${MSSQL_SA_PASSWORD}
     volumes:
       - ./identity/realms/realm-export.json:/opt/keycloak/data/import/realm-export.json
-      - ./identity/themes/olls:/opt/keycloak/themes/olls
+      - ./identity/themes/storefront-theme:/opt/keycloak/themes/storefront-theme
+      - ./identity/themes/backoffice-theme:/opt/keycloak/themes/backoffice-theme
     ports:
       - "8080:8080"
     networks:
@@ -101,9 +102,9 @@ services:
     networks:
       - course-network
 
-  storefront-reactjs:
-    container_name: "storefront-reactjs"
-    image: storefront-reactjs:latest
+  storefront:
+    container_name: "storefront"
+    image: storefront:latest
     ports:
       - "3000:80"
     networks:
@@ -119,10 +120,10 @@ services:
       - KEYCLOAK_SERVER_URI=${KEYCLOAK_SERVER_URI}
       - KEYCLOAK_CLIENT_SECRET_USER=${KEYCLOAK_CLIENT_SECRET_USER}
       - KEYCLOAK_ISSUER_URI=${KEYCLOAK_ISSUER_URI}
-      - spring.datasource.url=${USER_DATASOURCE_URL}
-      - spring.datasource.username=${MSSQL_SA_USERNAME}
-      - spring.datasource.password=${MSSQL_SA_PASSWORD}
-      - spring.datasource.driver-class-name=${SPRING_DATASOURCE_DRIVER_CLASS_NAME}
+      # - spring.datasource.url=${USER_DATASOURCE_URL}
+      # - spring.datasource.username=${MSSQL_SA_USERNAME}
+      # - spring.datasource.password=${MSSQL_SA_PASSWORD}
+      # - spring.datasource.driver-class-name=${SPRING_DATASOURCE_DRIVER_CLASS_NAME}
     networks:
       - course-network
 
