@@ -10,8 +10,6 @@ server {
         proxy_pass http://user-service:9000/user-service/;
     }
 
-
-
     location /course-service/ {
         proxy_pass http://course-service:9002/course-service/;
     }
@@ -19,7 +17,6 @@ server {
     location /media-service/ {
         proxy_pass http://media-service:9003/media-service/;
     }
-
 }
 
 server {
@@ -39,6 +36,20 @@ server {
     # http://storefront/api/**
     location /api/ {
         proxy_pass http://storefront-bff:8000/storefront/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+server {
+    listen 80;
+    server_name backoffice;
+    resolver 127.0.0.11;
+
+    location /api/ {
+        proxy_pass http://backoffice-bff:8040/backoffice/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
