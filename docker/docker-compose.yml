@@ -69,10 +69,10 @@ services:
     container_name: "mssql-cmd"
     depends_on:
       - mssql
-    command: /opt/mssql_scripts/run-initialization.sh
+    command: /opt/mssql/sql_scripts/run-initialization.sh
     stdin_open: true
     volumes:
-      - ./mssql_scripts:/opt/mssql_scripts
+      - ./mssql/sql_scripts:/opt/mssql/sql_scripts
     networks:
       - course-network
 
