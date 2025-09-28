@@ -1,8 +1,8 @@
 import React from "react";
-import styles from "./css/auth.module.css";
+import styles from "./css/auth_admin.module.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
-export default function Auth() {
+export default function Admin() {
   const handleLogin = (e) => {
     console.log("Login form submitted");
     e.preventDefault();

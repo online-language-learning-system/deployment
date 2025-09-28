@@ -158,6 +158,35 @@ body {
   font-size: 24px;
   color: #333;
   margin: 0 8px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.social-icons a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Google icon styling */
+.social-icons a:has(.fa-google) {
+  border-color: #ff6b35;
+  color: #ff6b35;
+}
+
+.social-icons a:has(.fa-google):hover {
+  background-color: #ff6b35;
+  color: white;
+}
+
+/* Facebook icon styling */
+.social-icons a:has(.fa-facebook) {
+  border-color: #1877f2;
+  color: #1877f2;
+}
+
+.social-icons a:has(.fa-facebook):hover {
+  background-color: #1877f2;
+  color: white;
 }
 
 /* Toggle Box */
