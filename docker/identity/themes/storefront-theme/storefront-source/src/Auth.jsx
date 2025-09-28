@@ -5,8 +5,6 @@ import axios from "axios";
 
 export default function Auth() {
   const [isActive, setIsActive] = useState(false);
-
-  // State quản lý form đăng ký
   const [registerForm, setRegisterForm] = useState({
     username: "",
     email: "",
@@ -181,7 +179,7 @@ export default function Auth() {
               value={registerForm.firstName}
               onChange={(e) => setRegisterForm({ ...registerForm, firstName: e.target.value })}
             />
-            <i className="fa fa-signature"></i>
+            <i className="fa fa-user"></i>
           </div>
           <div className={styles["input-box"]}>
             <input
@@ -192,7 +190,7 @@ export default function Auth() {
               value={registerForm.lastName}
               onChange={(e) => setRegisterForm({ ...registerForm, lastName: e.target.value })}
             />
-            <i className="fas fa-signature"></i>
+            <i className="fas fa-id-card"></i>
           </div>
           
           <div className={styles["input-box"]}>
