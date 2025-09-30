@@ -62,7 +62,7 @@ export default function Auth() {
       const accessToken = await getToken();
 
       const res = await axios.post(
-        "http://localhost:8000/storefront/users",
+        "http://localhost:8000/api/user-service/storefront/users",
         {
           username: registerForm.username,
           email: registerForm.email,

@@ -29,19 +29,17 @@ services:
       - --spi-theme-cache-themes=false
       - --spi-theme-cache-templates=false
     environment:
-      #- KC_HOSTNAME=localhost
+      - KC_DB=${MSSQL_HOSTNAME}
+      - KC_DB_URL=${MSSQL_DATASOURCE_URL};databaseName=identity_db;encrypt=false
+      - KC_DB_USERNAME=${MSSQL_SA_USERNAME}
+      - KC_DB_PASSWORD=${MSSQL_SA_PASSWORD}
       - KC_BOOTSTRAP_ADMIN_USERNAME=${KC_BOOTSTRAP_ADMIN_USERNAME}
       - KC_BOOTSTRAP_ADMIN_PASSWORD=${KC_BOOTSTRAP_ADMIN_PASSWORD}
-      #- KC_HOSTNAME=api.olls.local
-      #- KC_PROXY=edge
-      #- KC_DB=${MSSQL_HOSTNAME}
-      #- KC_DB_URL=${KC_DB_URL}
-      #- KC_DB_USERNAME=${MSSQL_SA_USERNAME}
-      #- KC_DB_PASSWORD=${MSSQL_SA_PASSWORD}
     volumes:
-      - ./identity/realms/realm-export.json:/opt/keycloak/data/import/realm-export.json
+      - ./identity/drivers:/opt/keycloak/providers
       - ./identity/themes/storefront-theme:/opt/keycloak/themes/storefront-theme
       - ./identity/themes/backoffice-theme:/opt/keycloak/themes/backoffice-theme
+      - ./identity/realms/realm-export.json:/opt/keycloak/data/import/realm-export.json
     ports:
       - "8080:8080"
     networks:
@@ -58,9 +56,9 @@ services:
       - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
     restart: unless-stopped
     volumes:
-      - ./data/mssql/backups:/var/opt/mssql/backups # SQL scripts, backups
-      - ./data/mssql/data:/var/opt/mssql/data       # Database files (.mdf, .ldf)
-      - ./data/mssql/log:/var/opt/mssql/log         # Log files
+      - ./mssql/data/mssql/backups:/var/opt/mssql/backups # SQL scripts, backups
+      - ./mssql/data/mssql/data:/var/opt/mssql/data       # Database files (.mdf, .ldf)
+      - ./mssql/data/mssql/log:/var/opt/mssql/log         # Log files
     networks:
       - course-network
 
@@ -84,15 +82,12 @@ services:
     networks:
       - course-network
 
-  storefront-bff:
-    build: D:/Work/course-management-system/storefront-bff
-    container_name: "storefront-bff"
+  storefront:
+    container_name: "storefront"
     image: storefront-bff:latest
     ports:
       - "8000:8000"
     environment:
-      # - SERVER_PORT=80
-      # - SERVER_SERVLET_CONTEXT_PATH=/storefront-bff
       - KEYCLOAK_CLIENT_SECRET_STOREFRONT=${KEYCLOAK_CLIENT_SECRET_STOREFRONT}
       - KEYCLOAK_TOKEN_URI=${KEYCLOAK_TOKEN_URI}
       - KEYCLOAK_ISSUER_URI=${KEYCLOAK_ISSUER_URI}
@@ -102,11 +97,34 @@ services:
     networks:
       - course-network
 
-  storefront:
-    container_name: "storefront"
+  storefront-reactjs:
+    container_name: "storefront-reactjs"
     image: storefront:latest
     ports:
       - "3000:80"
+    networks:
+      - course-network
+
+  backoffice:
+    container_name: "backoffice"
+    image: backoffice-bff:latest
+    ports:
+      - "8040:8040"
+    environment:
+      - KEYCLOAK_CLIENT_SECRET_BACKOFFICE=${KEYCLOAK_CLIENT_SECRET_BACKOFFICE}
+      - KEYCLOAK_TOKEN_URI=${KEYCLOAK_TOKEN_URI}
+      - KEYCLOAK_ISSUER_URI=${KEYCLOAK_ISSUER_URI}
+      - USER_SERVICE_URI=${USER_SERVICE_URI}
+      - BACKOFFICE_REACTJS_URI=${BACKOFFICE_REACTJS_URI}
+      - COURSE_SERVICE_URI=${COURSE_SERVICE_URI}
+    networks:
+      - course-network
+
+  backoffice-reactjs:
+    container_name: "backoffice-reactjs"
+    image: backoffice:latest
+    ports:
+      - "3040:80"
     networks:
       - course-network
 
@@ -127,8 +145,22 @@ services:
     networks:
       - course-network
 
+  cart-service:
+    image: ghcr.io/online-language-learning-system/cart-image:1.0.0
+    container_name: "cart-service"
+    ports:
+      - "9001:9001"
+    environment:
+      - KEYCLOAK_ISSUER_URI=${KEYCLOAK_ISSUER_URI}
+      - MSSQL_DATASOURCE_URL=${MSSQL_DATASOURCE_URL}
+      - MSSQL_SA_USERNAME=${MSSQL_SA_USERNAME}
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+      - KEYCLOAK_TOKEN_URL=${KEYCLOAK_TOKEN_URL}
+    networks:
+      - course-network
+
   media-service:
-    image: ghcr.io/online-language-learning-system/media-service:latest
+    image: ghcr.io/online-language-learning-system/media-image:1.0.0
     container_name: "media-service"
     ports:
       - "9003:9003"
@@ -138,7 +170,7 @@ services:
       - course-network
 
   course-service:
-    image:  course-service:latest
+    image: ghcr.io/online-language-learning-system/course-image:1.0.0
     container_name: "course-service"
     ports:
       - "9002:9002"
