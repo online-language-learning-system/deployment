@@ -1,24 +1,8 @@
 version: "3.9"
 
-# application stack - Each server when running will create a separate container
-
-# In the internal docker network (containers call each other)
-#  → you use the service name (service-name:port).
-# From the host machine (browser, Postman)
-#  → you use localhost + mapped port (localhost:port).
-
+# application stack
+#  - Each server when running will create a separate container
 services:
-
-  nginx:
-    image: nginx:1.27.2
-    container_name: "nginx"
-    restart: unless-stopped
-    volumes:
-      - ./nginx/templates:/etc/nginx/templates
-    ports:
-      - "80:80"
-    networks:
-      - course-network
 
   identity: # This container used for initializing Identity Provider - Keycloak
     image: quay.io/keycloak/keycloak:26.0.2
@@ -74,17 +58,37 @@ services:
     networks:
       - course-network
 
-  redis:
-    image: redis:7.2
-    container_name: "redis"
+  zookeeper:
+    image: debezium/zookeeper:2.7.3.Final
+    restart: always
     ports:
-      - "6379:6379"
+      - 2181:2181
+      - 2888:2888
+      - 3888:3888
+    networks:
+      - course-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.7.1
+    container_name: "kafka"
+    depends_on:
+      - zookeeper
+    ports:
+      - ${KAFKA_SERVICE_PORT}:${KAFKA_SERVICE_PORT}
+      - 29092:29092
+    environment:
+      - KAFKA_BROKER_ID
+      - KAFKA_ZOOKEEPER_CONNECT
+      - KAFKA_ADVERTISED_LISTENERS
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+      - KAFKA_INTER_BROKER_LISTENER_NAME
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
     networks:
       - course-network
 
   storefront:
     container_name: "storefront"
-    image: storefront-bff:latest
+    image: ghcr.io/online-language-learning-system/storefront-bff-image:1.0.0
     ports:
       - "8000:8000"
     environment:
@@ -107,7 +111,7 @@ services:
 
   backoffice:
     container_name: "backoffice"
-    image: backoffice-bff:latest
+    image: ghcr.io/online-language-learning-system/backoffice-bff-image:1.0.0
     ports:
       - "8040:8040"
     environment:
@@ -129,19 +133,14 @@ services:
       - course-network
 
   user-service:
-    build: D:/Work/course-management-system/user-service
     container_name: "user-service"
-    image: user-service:latest
+    image: ghcr.io/online-language-learning-system/user-image:1.0.0
     ports:
       - "9000:9000"
     environment:
       - KEYCLOAK_SERVER_URI=${KEYCLOAK_SERVER_URI}
       - KEYCLOAK_CLIENT_SECRET_USER=${KEYCLOAK_CLIENT_SECRET_USER}
       - KEYCLOAK_ISSUER_URI=${KEYCLOAK_ISSUER_URI}
-      # - spring.datasource.url=${USER_DATASOURCE_URL}
-      # - spring.datasource.username=${MSSQL_SA_USERNAME}
-      # - spring.datasource.password=${MSSQL_SA_PASSWORD}
-      # - spring.datasource.driver-class-name=${SPRING_DATASOURCE_DRIVER_CLASS_NAME}
     networks:
       - course-network
 
@@ -170,7 +169,7 @@ services:
       - course-network
 
   course-service:
-    image: ghcr.io/online-language-learning-system/course-image:1.0.0
+    image: ghcr.io/online-language-learning-system/course-image:1.0.1
     container_name: "course-service"
     ports:
       - "9002:9002"
