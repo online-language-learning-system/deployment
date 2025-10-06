@@ -43,6 +43,12 @@ services:
       - ./mssql/data/mssql/backups:/var/opt/mssql/backups # SQL scripts, backups
       - ./mssql/data/mssql/data:/var/opt/mssql/data       # Database files (.mdf, .ldf)
       - ./mssql/data/mssql/log:/var/opt/mssql/log         # Log files
+    healthcheck:
+      test: [ "CMD-SHELL", "bash -c '</dev/tcp/localhost/1433'" ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
     networks:
       - course-network
 
@@ -61,6 +67,7 @@ services:
   zookeeper:
     image: debezium/zookeeper:2.7.3.Final
     restart: always
+    container_name: "zookeeper"
     ports:
       - 2181:2181
       - 2888:2888
@@ -69,7 +76,7 @@ services:
       - course-network
 
   kafka:
-    image: confluentinc/cp-kafka:7.7.1
+    build: ./kafka
     container_name: "kafka"
     depends_on:
       - zookeeper
@@ -77,12 +84,25 @@ services:
       - ${KAFKA_SERVICE_PORT}:${KAFKA_SERVICE_PORT}
       - 29092:29092
     environment:
-      - KAFKA_BROKER_ID
-      - KAFKA_ZOOKEEPER_CONNECT
-      - KAFKA_ADVERTISED_LISTENERS
-      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
-      - KAFKA_INTER_BROKER_LISTENER_NAME
-      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+      - KAFKA_BROKER_ID=${KAFKA_BROKER_ID}
+      - KAFKA_ZOOKEEPER_CONNECT=${KAFKA_ZOOKEEPER_CONNECT}
+      - KAFKA_ADVERTISED_LISTENERS=${KAFKA_ADVERTISED_LISTENERS}
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}
+      - KAFKA_INTER_BROKER_LISTENER_NAME=${KAFKA_INTER_BROKER_LISTENER_NAME}
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=${KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR}
+    networks:
+      - course-network
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: "kafka-ui"
+    depends_on:
+      - kafka
+    ports:
+      - 8090:8080
+    environment:
+      DYNAMIC_CONFIG_ENABLED: 'true'
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
     networks:
       - course-network
 
