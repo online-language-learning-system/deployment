@@ -134,3 +134,29 @@ BEGIN
         FOREIGN KEY (lesson_id) REFERENCES dbo.lesson(id) ON DELETE CASCADE
     );
 END;
+
+-- TAG
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tag') AND type = 'U')
+BEGIN
+    CREATE TABLE dbo.tag (
+        id              BIGINT IDENTITY(1,1) PRIMARY KEY,
+        tag_name        NVARCHAR(50) NOT NULL,
+        is_active       BIT NOT NULL DEFAULT 0
+    );
+END;
+
+-- COURSE TAG
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.course_tag') AND type = 'U')
+BEGIN
+    CREATE TABLE dbo.course_tag (
+        id              BIGINT IDENTITY(1,1) PRIMARY KEY,
+        course_id       BIGINT NOT NULL,
+        tag_id          BIGINT NOT NULL,
+
+        CONSTRAINT FK_Course_Tag_Course
+            FOREIGN KEY (course_id) REFERENCES dbo.course(id) ON DELETE CASCADE,
+
+        CONSTRAINT FK_Course_Tag_Tag
+            FOREIGN KEY (tag_id) REFERENCES dbo.tag(id) ON DELETE CASCADE
+    );
+END;

@@ -4,6 +4,17 @@ version: "3.9"
 #  - Each server when running will create a separate container
 services:
 
+  nginx:
+    image: nginx:1.27.2
+    container_name: "nginx"
+    restart: unless-stopped
+    volumes:
+      - ./nginx/templates:/etc/nginx/templates
+    ports:
+      - "80:80"
+    networks:
+      - course-network
+
   identity: # This container used for initializing Identity Provider - Keycloak
     image: quay.io/keycloak/keycloak:26.0.2
     container_name: "identity"
