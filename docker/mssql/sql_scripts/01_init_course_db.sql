@@ -58,7 +58,7 @@ BEGIN
         description             NVARCHAR(255) NOT NULL,
         start_date              DATETIMEOFFSET NOT NULL,
         end_date                DATETIMEOFFSET NOT NULL,
-        approval_status         NVARCHAR(20) NOT NULL,
+        course_status           NVARCHAR(20) NOT NULL,
         created_by              NVARCHAR(100) NOT NULL,
         created_on              DATETIMEOFFSET NOT NULL,
         last_modified_by        NVARCHAR(100) NOT NULL,
