@@ -40,6 +40,19 @@ services:
     networks:
       - course-network
 
+#  redis:
+#    image: redis:7.4.1-alpine
+#    restart: always
+#    ports:
+#      - '6379:6379'
+#    environment:
+#      - SPRING_DATA_REDIS_HOST
+#      - SPRING_DATA_REDIS_PORT
+#    volumes:
+#      - redis:/data
+#    networks:
+#      - course-network
+
   mssql:  # This container used for initializing SQL Server
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: "mssql"

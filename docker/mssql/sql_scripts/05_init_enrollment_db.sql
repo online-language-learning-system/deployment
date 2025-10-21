@@ -1,7 +1,7 @@
-IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N"enrollment_db")
+IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N'enrollment_db')
 BEGIN
     CREATE DATABASE enrollment_db;
-END
+END;
 GO
 
 USE enrollment_db;
