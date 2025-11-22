@@ -1,69 +1,22 @@
 server {
-    # listen is Nginx port
-    server_name api.hajime.local;
-
-    # Internal Docker DNS
-    resolver 127.0.0.11;
-
-    location /user-service/ {
-        proxy_pass http://user-service:9000/user-service/;
-    }
-
-    location /cart-service/ {
-        proxy_pass http://media-service:9001/cart-service/;
-    }
-
-    location /course-service/ {
-        proxy_pass http://course-service:9002/course-service/;
-    }
-
-    location /media-service/ {
-        proxy_pass http://media-service:9003/media-service/;
-    }
-}
-
-server {
-    listen 80;
-    server_name storefront;
-    resolver 127.0.0.11;
-
-    # http://storefront/**
-    location / {
-        proxy_pass http://storefront-bff:8000;
-        
-    }
-
-}
-
-server {
-    listen 80;
-    server_name backoffice;
-    resolver 127.0.0.11;
-
-    location /api/ {
-        proxy_pass http://backoffice-bff:8040/backoffice/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-
-server {
-    listen 80;
-    server_name identity;
-    resolver 127.0.0.11;
+    listen 80 default_server;
+    server_name j-hajime.com;
 
     location / {
-        proxy_pass http://identity:8080/;
+        proxy_pass http://storefront:8000/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
 
-        # Workaround to void CORS error from Reactjs
-        if ($uri ~ "^(.*)/(protocol/openid-connect/auth|login/oauth2/code)(.*)") {
-            add_header Access-Control-Allow-Origin *;
-        }
+server {
+    listen 80;
+    server_name storefront-reactjs;
+
+    root /usr/share/nginx/html;
+    index index.html index.htm;
+
+    location / {
+        try_files $uri /index.html;
     }
 }
