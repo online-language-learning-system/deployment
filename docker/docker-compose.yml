@@ -178,7 +178,8 @@ services:
 
   user-service:
     container_name: "user-service"
-    image: ghcr.io/online-language-learning-system/user-image:1.0.0
+    #image: ghcr.io/online-language-learning-system/user-image:1.0.0
+    image: user-service:1.0.0
     ports:
       - "9000:9000"
     environment:
