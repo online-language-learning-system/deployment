@@ -64,7 +64,7 @@ export default function Auth() {
       const res = await axios.post(
         "http://localhost:8000/api/user-service/storefront/users",
         {
-          username: registerForm.username,
+            username: registerForm.username,
           email: registerForm.email,
           password: registerForm.password,
           passwordConfirm: registerForm.passwordConfirm,
@@ -96,25 +96,25 @@ export default function Auth() {
       {/* Login Form */}
       <div className={`${styles["form-box"]} ${styles.login}`}>
         <form onSubmit={handleLogin}>
-          <h1>Login</h1>
+          <h1>Đăng Nhập</h1>
           <div className={styles["input-box"]}>
-            <input type="text" name="username" placeholder="Username" required />
+            <input type="text" name="username" placeholder="Tên đăng nhập" required />
             <i className="fas fa-user"></i>
           </div>
           <div className={styles["input-box"]}>
-            <input type="password" name="password" placeholder="Password" required />
+            <input type="password" name="password" placeholder="mật khẩu" required />
             <i className="fas fa-lock"></i>
           </div>
           <div className={styles["remember-forgot"]}>
             <label>
-              <input type="checkbox" /> Remember me
+              <input type="checkbox" /> nhớ tôi
             </label>
-            <a href="#">Forgot Password?</a>
+            <a href="#">quên mật khẩu?</a>
           </div>
           <button type="submit" className={styles.btn}>
-            Login
+            Đăng nhập
           </button>
-          <p>or login with social platforms</p>
+          <p>đăng nhập bằng nền tảng khác</p>
           <div className={styles["social-icons"]}>
             <a href="#"><i className="fab fa-google"></i></a>
             <a href="#"><i className="fab fa-facebook"></i></a>
@@ -125,12 +125,12 @@ export default function Auth() {
       {/* Register Form */}
       <div className={`${styles["form-box"]} ${styles.register}`}>
         <form onSubmit={handleRegister}>
-          <h1>Register</h1>
+          <h1>Đăng Ký</h1>
           <div className={styles["input-box"]}>
             <input
               type="text"
               name="username"
-              placeholder="Username"
+              placeholder="Tên đăng nhập"
               required
               value={registerForm.username}
               onChange={(e) => setRegisterForm({ ...registerForm, username: e.target.value })}
@@ -152,7 +152,7 @@ export default function Auth() {
             <input
               type="password"
               name="password"
-              placeholder="Password"
+              placeholder="mật khẩu"
               required
               value={registerForm.password}
               onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
@@ -163,7 +163,7 @@ export default function Auth() {
             <input
               type="password"
               name="passwordConfirm"
-              placeholder="Confirm Password"
+              placeholder="Xác nhận mật khẩu"
               required
               value={registerForm.passwordConfirm}
               onChange={(e) => setRegisterForm({ ...registerForm, passwordConfirm: e.target.value })}
@@ -174,7 +174,7 @@ export default function Auth() {
             <input
               type="text"
               name="firstName"
-              placeholder="First Name"
+              placeholder="Họ và tên lót"
               required
               value={registerForm.firstName}
               onChange={(e) => setRegisterForm({ ...registerForm, firstName: e.target.value })}
@@ -185,7 +185,7 @@ export default function Auth() {
             <input
               type="text"
               name="lastName"
-              placeholder="Last Name"
+              placeholder="Tên"
               required
               value={registerForm.lastName}
               onChange={(e) => setRegisterForm({ ...registerForm, lastName: e.target.value })}
@@ -194,9 +194,9 @@ export default function Auth() {
           </div>
           
           <div className={styles["input-box"]}>
-            <label>Register Role</label>
+            <label>Đăng ký quyền</label>
             <div className={styles["roles-checkbox"]}>
-              {["STUDENT", "LECTURER"].map((role) => (
+              {["student", "lecturer"].map((role) => (
                 <label key={role}>
                   <input
                     type="radio"
@@ -215,9 +215,9 @@ export default function Auth() {
 
 
           <button type="submit" className={styles.btn}>
-            Register
+            Đăng ký
           </button>
-          <p>or register with social platforms</p>
+          <p>hoặc đăng ký bằng các nền tảng khác</p>
           <div className={styles["social-icons"]}>
             <a href="#"><i className="fab fa-google"></i></a>
             <a href="#"><i className="fab fa-facebook"></i></a>
@@ -228,26 +228,26 @@ export default function Auth() {
       {/* Toggle Box */}
       <div className={styles["toggle-box"]}>
         <div className={`${styles["toggle-panel"]} ${styles["toggle-left"]}`}>
-          <h1>Hello, Welcome!</h1>
-          <p>Don't have an account?</p>
+          <h1>Xin chào!</h1>
+          <p>Bạn không có tài khoản?</p>
           <button
             type="button"
             className={styles.btn}
             onClick={() => setIsActive(true)}
           >
-            Register
+            Đăng ký
           </button>
         </div>
 
         <div className={`${styles["toggle-panel"]} ${styles["toggle-right"]}`}>
-          <h1>Welcome Back!</h1>
-          <p>Already have an account?</p>
+          <h1>Chào mừng trở lại!</h1>
+          <p>Bạn đã có tài khoản?</p>
           <button
             type="button"
             className={styles.btn}
             onClick={() => setIsActive(false)}
           >
-            Login
+            Đăng nhập
           </button>
         </div>
       </div>

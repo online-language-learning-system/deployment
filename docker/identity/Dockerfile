@@ -5,9 +5,11 @@ COPY realms/realm-export.json /opt/keycloak/data/import/
 COPY themes/storefront-theme /opt/keycloak/themes/storefront-theme
 COPY themes/backoffice-theme /opt/keycloak/themes/backoffice-theme
 
+RUN /opt/keycloak/bin/kc.sh build
+
 ENV KEYCLOAK_ADMIN=admin
 ENV KEYCLOAK_ADMIN_PASSWORD=admin
 
 EXPOSE 8080
 
-ENTRYPOINT ["/opt/keycloak/bin/kc.sh", "start-dev", "--import-realm"]
+ENTRYPOINT ["/opt/keycloak/bin/kc.sh", "start", "--import-realm"]

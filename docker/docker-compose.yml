@@ -1,21 +1,8 @@
 version: "3.9"
 
-# application stack
-#  - Each server when running will create a separate container
 services:
 
-  nginx:
-    image: nginx:1.27.2
-    container_name: "nginx"
-    restart: unless-stopped
-    volumes:
-      - ./nginx/templates:/etc/nginx/templates
-    ports:
-      - "80:80"
-    networks:
-      - course-network
-
-  identity: # This container used for initializing Identity Provider - Keycloak
+  identity: 
     image: quay.io/keycloak/keycloak:26.0.2
     container_name: "identity"
     command:
@@ -40,20 +27,7 @@ services:
     networks:
       - course-network
 
-#  redis:
-#    image: redis:7.4.1-alpine
-#    restart: always
-#    ports:
-#      - '6379:6379'
-#    environment:
-#      - SPRING_DATA_REDIS_HOST
-#      - SPRING_DATA_REDIS_PORT
-#    volumes:
-#      - redis:/data
-#    networks:
-#      - course-network
-
-  mssql:  # This container used for initializing SQL Server
+  mssql:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: "mssql"
     hostname: "mssql"
@@ -65,7 +39,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./mssql/data/mssql/backups:/var/opt/mssql/backups # SQL scripts, backups
-      - ./mssql/data/mssql/data:/var/opt/mssql/data       # Database files (.mdf, .ldf)
+      - ./mssql/data/mssql/data:/var/opt/mssql/data      
       - ./mssql/data/mssql/log:/var/opt/mssql/log         # Log files
     healthcheck:
       test: [ "CMD-SHELL", "bash -c '</dev/tcp/localhost/1433'" ]
@@ -132,7 +106,7 @@ services:
 
   storefront:
     container_name: "storefront"
-    image: ghcr.io/online-language-learning-system/storefront-bff-image:1.0.0
+    image: storefront-bff:latest
     ports:
       - "8000:8000"
     environment:
@@ -178,8 +152,7 @@ services:
 
   user-service:
     container_name: "user-service"
-    #image: ghcr.io/online-language-learning-system/user-image:1.0.0
-    image: user-service:1.0.0
+    image: user-service:latest
     ports:
       - "9000:9000"
     environment:
@@ -204,7 +177,7 @@ services:
       - course-network
 
   media-service:
-    image: ghcr.io/online-language-learning-system/media-image:1.0.0
+    image: ghcr.io/online-language-learning-system/media-image:1.0.1
     container_name: "media-service"
     ports:
       - "9003:9003"
@@ -226,6 +199,58 @@ services:
       - MEDIA_SERVICE=${MEDIA_SERVICE}
     networks:
       - course-network
+
+  order-service:
+    image: order-service:latest
+    container_name: "order-service"
+    ports:
+      - "9004:9004"
+    environment:
+      - KEYCLOAK_ISSUER_URI=${KEYCLOAK_ISSUER_URI}
+      - MSSQL_DATASOURCE_URL=${MSSQL_DATASOURCE_URL}
+      - MSSQL_SA_USERNAME=${MSSQL_SA_USERNAME}
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+    networks:
+      - course-network
+
+  enrollment-service:
+    image: enrollment-service:latest
+    container_name: "enrollment-service"
+    ports:
+      - "9005:9005"
+    environment:
+      - KEYCLOAK_ISSUER_URI=${KEYCLOAK_ISSUER_URI}
+      - MSSQL_DATASOURCE_URL=${MSSQL_DATASOURCE_URL}
+      - MSSQL_SA_USERNAME=${MSSQL_SA_USERNAME}
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+    networks:
+      - course-network
+
+  progress-service:
+    image: progress-service:latest
+    container_name: "progress-service"
+    ports:
+      - "9007:9007"
+    environment:
+      - KEYCLOAK_ISSUER_URI=${KEYCLOAK_ISSUER_URI}
+      - MSSQL_DATASOURCE_URL=${MSSQL_DATASOURCE_URL}
+      - MSSQL_SA_USERNAME=${MSSQL_SA_USERNAME}
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+    networks:
+      - course-network
+
+  notification-service:
+      image: notification-service:latest
+      container_name: "notification-service"
+      ports:
+        - "9008:9008"
+      environment:
+        - KEYCLOAK_ISSUER_URI=${KEYCLOAK_ISSUER_URI}
+        - MSSQL_DATASOURCE_URL=${MSSQL_DATASOURCE_URL}
+        - MSSQL_SA_USERNAME=${MSSQL_SA_USERNAME}
+        - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+      networks:
+        - course-network
 
 networks:
   course-network:

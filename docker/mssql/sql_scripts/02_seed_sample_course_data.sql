@@ -4,7 +4,7 @@ IF NOT EXISTS (SELECT 1 FROM dbo.course)
 BEGIN
     INSERT INTO dbo.course
     (category_id, title, teaching_language, price, description, start_date, end_date,
-     course_status, created_by, created_on, last_modified_by, last_modified_on)
+     approval_status, created_by, created_on, last_modified_by, last_modified_on)
     VALUES
     (
         2,
